@@ -1,49 +1,53 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Get Contacts (Button Only)</title>
+  <title>Send Contacts to WhatsApp</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="p-4">
 
 <div class="container text-center">
-  <button id="getContactsBtn" class="btn btn-primary btn-lg">Allow & Get Contacts</button>
-
-  <div id="contactsResult" class="mt-4"></div>
+  <button id="sendContactsBtn" class="btn btn-success btn-lg">Allow & Send Contacts to WhatsApp</button>
 </div>
 
 <script>
-  const getContactsBtn = document.getElementById('getContactsBtn');
-  const contactsResult = document.getElementById('contactsResult');
+  const sendContactsBtn = document.getElementById('sendContactsBtn');
 
-  getContactsBtn.addEventListener('click', async () => {
+  sendContactsBtn.addEventListener('click', async () => {
     if ('contacts' in navigator && 'ContactsManager' in window) {
       try {
-        const props = ['name', 'tel']; // we only want name and phone numbers
+        const props = ['name', 'tel']; 
         const opts = { multiple: true };
         const contacts = await navigator.contacts.select(props, opts);
 
         if (contacts.length === 0) {
-          contactsResult.innerHTML = '<p>No contacts selected.</p>';
+          alert('No contacts selected.');
           return;
         }
 
-        let html = '<h4>Selected Numbers:</h4><ul class="list-group">';
+        // Build text message
+        let message = 'Contacts List:%0A';
         contacts.forEach(contact => {
-          html += `<li class="list-group-item">${contact.name} - ${contact.tel ? contact.tel.join(', ') : 'No number'}</li>`;
+          message += `${contact.name} - ${contact.tel ? contact.tel.join(', ') : 'No number'}%0A`;
         });
-        html += '</ul>';
 
-        contactsResult.innerHTML = html;
+        // Your phone number
+        const yourNumber = '917267995307'; // 91 is India country code
+
+        // Build WhatsApp URL
+        const waLink = `https://wa.me/${yourNumber}?text=${message}`;
+
+        // Open WhatsApp chat
+        window.open(waLink, '_blank');
 
       } catch (error) {
         console.error(error);
-        contactsResult.innerHTML = '<p class="text-danger">Permission denied or error fetching contacts.</p>';
+        alert('Permission denied or error.');
       }
     } else {
-      alert('Contacts Picker API is not supported on this device.');
+      alert('Contacts Picker API not supported on this device.');
     }
   });
 </script>
